@@ -10,30 +10,31 @@ pipeline {
                     }
                     sh 'mvn clean install -DskipTests'
                }
+               post {
+                    failure {
+                         script {
+                              pullRequest.createStatus(status: 'error',
+                              context: 'continuous-integration/jenkins/pr-merge/build',
+                              description: 'Maven build is failed')
+                         }
+                    }
+                    unstable {
+                         script  {
+                              pullRequest.createStatus(status: 'error',
+                              context: 'continuous-integration/jenkins/pr-merge/build',
+                              description: 'Maven build is unstable')
+                         }
+                    }
+                    success {
+                         script {
+                              pullRequest.createStatus(status: 'success',
+                              context: 'continuous-integration/jenkins/pr-merge/build',
+                              description: 'Maven build is OK')
+                         }
+                    }
+               }
           }
-          post {
-               failure {
-                    script {
-                         pullRequest.createStatus(status: 'error',
-                         context: 'continuous-integration/jenkins/pr-merge/build',
-                         description: 'Maven build is failed')
-                    }
-               }
-               unstable {
-                    script  {
-                         pullRequest.createStatus(status: 'error',
-                         context: 'continuous-integration/jenkins/pr-merge/build',
-                         description: 'Maven build is unstable')
-                    }
-               }
-               success {
-                    script {
-                         pullRequest.createStatus(status: 'success',
-                         context: 'continuous-integration/jenkins/pr-merge/build',
-                         description: 'Maven build is OK')
-                    }
-               }
-          }
+          
           stage('Unit test') {
                steps {
                     script {
@@ -41,34 +42,31 @@ pipeline {
                               context: 'continuous-integration/jenkins/pr-merge/test',
                               description: 'Maven test execution has been started')
                     }
-                    sh 'mvn test -fn'
+                    sh 'mvn test -fnl'
+                    junit testResults: '**/target/surefire-reports/TEST-*.xml'
+
                }
                post {
-                    always {
-                         junit testResults: '**/target/surefire-reports/TEST-*.xml'
+                    failure {
+                         script {
+                              pullRequest.createStatus(status: 'error',
+                              context: 'continuous-integration/jenkins/pr-merge/test',
+                              description: 'Maven test is failed')
+                         }
                     }
-               }
-          }
-          post {
-               failure {
-                    script {
-                         pullRequest.createStatus(status: 'error',
-                         context: 'continuous-integration/jenkins/pr-merge/test',
-                         description: 'Maven test is failed')
+                    unstable {
+                         script  {
+                              pullRequest.createStatus(status: 'error',
+                              context: 'continuous-integration/jenkins/pr-merge/test',
+                              description: 'Maven test is unstable')
+                         }
                     }
-               }
-               unstable {
-                    script  {
-                         pullRequest.createStatus(status: 'error',
-                         context: 'continuous-integration/jenkins/pr-merge/test',
-                         description: 'Maven test is unstable')
-                    }
-               }
-               success {
-                    script {
-                         pullRequest.createStatus(status: 'success',
-                         context: 'continuous-integration/jenkins/pr-merge/test',
-                         description: 'Maven test is OK')
+                    success {
+                         script {
+                              pullRequest.createStatus(status: 'success',
+                              context: 'continuous-integration/jenkins/pr-merge/test',
+                              description: 'Maven test is OK')
+                         }
                     }
                }
           }
