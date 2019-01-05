@@ -6,6 +6,11 @@ node {
 
         }
 
+        stage('Clean') {
+
+            status = sh returnStatus: true, script: 'mvn clean install -DskipTests'
+                    }
+
         stage('Build') {
             prStatusStart("build")
             status = sh returnStatus: true, script: 'mvn clean install -DskipTests'
