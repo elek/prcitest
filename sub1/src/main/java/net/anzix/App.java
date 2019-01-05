@@ -2,8 +2,6 @@ package net.anzix;
 
 /**
  * Hello world!
- *
- * @author elek
  */
 public final class App {
 
