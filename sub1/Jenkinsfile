@@ -32,7 +32,7 @@ def stageRunner(name, type) {
         stage(name) {
 
             prStatusStart(type)
-            output = sh returnStatus: true, script: 'sub1/dev-support/checks/' + type + '.sh'
+            status = sh returnStatus: true, script: 'sub1/dev-support/checks/' + type + '.sh'
             prStatusResult(status, type)
         }
         return true
@@ -51,14 +51,15 @@ def prStatusStart(name) {
 }
 
 def prStatusResult(responseCode, name) {
+    status = "error"
+    desc = "failed"
+    if (responseCode == 0) {
+        status = "success"
+        desc = "passed"
+    }
+    message = name + " is " + desc
+    //System.out.println(responseCode)
     if (env.CHANGE_ID) {
-        status = "error"
-        desc = "failed"
-        if (responseCode == 0) {
-            status = "success"
-            desc = "passed"
-        }
-        message = name + " is " + desc
         pullRequest.createStatus(status: status,
                 context: 'continuous-integration/jenkins/pr-merge/' + name,
                 description: message)

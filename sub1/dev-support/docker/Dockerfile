@@ -31,3 +31,5 @@ RUN mkdir -p /opt && \
 
 #Install docker-compose
 RUN pip install docker-compose
+
+ENV PATH=$PATH:/opt/findbugs/bin

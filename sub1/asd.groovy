@@ -1,49 +1,46 @@
 node {
-    docker.image('elek/ozone-build').inside {
-        stage('Checkout') { // for display purposes
-            git 'https://github.com/elek/prcitest.git'
 
+    docker.image('elek/ozone-build').inside {
+
+
+        stage('Clean') {
+            status = sh returnStatus: true, script: 'mvn clean'
         }
+
+        stageRunner('Author', "author")
+
         stage('Build') {
             prStatusStart("build")
             status = sh returnStatus: true, script: 'mvn clean install -DskipTests'
             prStatusResult(status, "build")
         }
 
-        stage('Licence') {
-            prStatusStart("licence")
-            output = sh returnStatus: true, script: 'sub1/dev-support/checks/rat.sh'
-            prStatusResult(status, "licence")
-        }
+        stageRunner('Licence', "rat")
 
-        stage('Author') {
-            prStatusStart("author")
-            output = sh returnStatus: true, script: 'sub1/dev-support/checks/author.sh'
-            prStatusResult(status, "author")
-        }
+        stageRunner('Unit test', "unit")
 
-        stage('Unit test') {
-            prStatusStart("test")
-            output = sh returnStatus: true, script: 'sub1/dev-support/checks/unit.sh'
-            junit '**/target/surefire-reports/*.xml'
-            prStatusResult(status, "unit")
-        }
+        stageRunner('Findbugs', "findbugs")
 
-        stage('Checkstyle') {
-            prStatusStart("checkstyle")
-            output = sh returnStatus: true, script: 'sub1/dev-support/checks/checkstyle.sh'
-            prStatusResult(status, "checkstyle")
-        }
+        stageRunner('Checkstyle', "checkstyle")
 
-        stage('Findbugs') {
-            prStatusStart("findbugs")
-            output = sh returnStatus: true, script: 'sub1/dev-support/checks/findbugs.sh'
-            prStatusResult(status, "findbugs")
-        }
     }
 
 }
 
+def stageRunner(name, type) {
+    try {
+        stage(name) {
+
+            prStatusStart(type)
+            status = sh returnStatus: true, script: 'sub1/dev-support/checks/' + type + '.sh'
+            prStatusResult(status, type)
+        }
+        return true
+    } catch (RuntimeException ex) {
+        currentBuild.result = "FAILED"
+        return false
+    }
+}
 
 def prStatusStart(name) {
     if (env.CHANGE_ID) {
@@ -54,18 +51,20 @@ def prStatusStart(name) {
 }
 
 def prStatusResult(responseCode, name) {
+    status = "error"
+    desc = "failed"
+    if (responseCode == 0) {
+        status = "success"
+        desc = "passed"
+    }
+    message = name + " is " + desc
+    //System.out.println(responseCode)
     if (env.CHANGE_ID) {
-        status = "error"
-        desc = "failed"
-        if (responseCode == 0) {
-            status = "success"
-            desc = "passed"
-        }
         pullRequest.createStatus(status: status,
                 context: 'continuous-integration/jenkins/pr-merge/' + name,
-                description: name + " is " + desc)
+                description: message)
     }
     if (responseCode != 0) {
-        currentBuild.result = "FAILURE"
+        throw new RuntimeException(message)
     }
 }
