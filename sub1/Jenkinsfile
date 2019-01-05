@@ -1,15 +1,13 @@
 node {
 
     docker.image('elek/ozone-build').inside {
-        stage('Checkout') { // for display purposes
-            git 'https://github.com/elek/prcitest.git'
 
-        }
 
         stage('Clean') {
+            status = sh returnStatus: true, script: 'mvn clean'
+        }
 
-            status = sh returnStatus: true, script: 'mvn clean install -DskipTests'
-                    }
+        stageRunner('Author', "author")
 
         stage('Build') {
             prStatusStart("build")
@@ -18,9 +16,11 @@ node {
         }
 
         stageRunner('Licence', "rat")
-        stageRunner('Author', "author")
+
         stageRunner('Unit test', "unit")
+
         stageRunner('Findbugs', "findbugs")
+
         stageRunner('Checkstyle', "checkstyle")
 
     }

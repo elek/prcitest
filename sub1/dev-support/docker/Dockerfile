@@ -1,0 +1,33 @@
+FROM alpine
+RUN apk add --update --no-cache bash alpine-sdk maven grep openjdk8 py-pip rsync procps autoconf automake libtool
+
+#Install real glibc
+RUN apk --no-cache add ca-certificates wget && \
+    wget -q -O /etc/apk/keys/sgerrand.rsa.pub https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub && \
+    wget https://github.com/sgerrand/alpine-pkg-glibc/releases/download/2.28-r0/glibc-2.28-r0.apk && \
+    apk add glibc-2.28-r0.apk
+
+#Install protobuf
+RUN mkdir -p /usr/local/src/ && \
+    cd /usr/local/src/ && \
+    wget https://github.com/google/protobuf/releases/download/v2.5.0/protobuf-2.5.0.tar.gz && \
+    tar xvf protobuf-2.5.0.tar.gz && \
+    cd protobuf-2.5.0 && \
+    ./autogen.sh && \
+    ./configure --prefix=/usr && \
+    make && \
+    make install && \
+    protoc --version
+
+#Findbug install
+RUN mkdir -p /opt && \
+    curl -sL https://sourceforge.net/projects/findbugs/files/findbugs/3.0.1/findbugs-3.0.1.tar.gz/download | tar -xz  && \
+     mv findbugs-* /opt/findbugs
+
+#Install apache-ant
+RUN mkdir -p /opt && \
+    curl -sL 'https://www.apache.org/dyn/mirrors/mirrors.cgi?action=download&filename=/ant/binaries/apache-ant-1.10.5-bin.tar.gz' | tar -xz  && \
+       mv apache-ant* /opt/ant
+
+#Install docker-compose
+RUN pip install docker-compose
