@@ -5,6 +5,9 @@ package net.anzix;
  */
 public final class App {
 
+  private App() {
+  }
+
   /**
    * asd.
    *
