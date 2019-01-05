@@ -18,28 +18,34 @@ node {
             prStatusResult(status, "build")
         }
 
-        stageRunner('Licence', "rat", {})
+        stageRunner('Licence', "rat", {
+            archiveArtifacts 'target/rat-aggregated.txt'
+        }, 'artifact/target/rat-aggregated.txt/*view*/')
 
         stageRunner('Unit test', "unit", {
             junit '**/target/surefire-reports/*.xml'
-        })
+        }, 'testReport/')
 
-        stageRunner('Findbugs', "findbugs", {})
+        stageRunner('Findbugs', "findbugs", {
+            archiveArtifacts 'target/findbugs-all.txt'
 
-        stageRunner('Checkstyle', "checkstyle", {})
+        }, 'artifact/target/findbugs-all.txt/*view*/')
+
+        stageRunner('Checkstyle', "checkstyle", {
+            checkstyle canComputeNew: false, canRunOnFailed: true, defaultEncoding: '', healthy: '', pattern: '**/checkstyle-result.xml', unHealthy: ''
+        }, 'checkstyleResult')
 
     }
 
 }
 
-def stageRunner(name, type, processResult) {
+def stageRunner(name, type, processResult, url = '') {
     try {
         stage(name) {
-
             prStatusStart(type)
             status = sh returnStatus: true, script: 'sub1/dev-support/checks/' + type + '.sh'
             processResult()
-            prStatusResult(status, type)
+            prStatusResult(status, type, url)
         }
         return true
     } catch (RuntimeException ex) {
@@ -56,7 +62,7 @@ def prStatusStart(name) {
     }
 }
 
-def prStatusResult(responseCode, name) {
+def prStatusResult(responseCode, name, url = '') {
     status = "error"
     desc = "failed"
     if (responseCode == 0) {
@@ -66,9 +72,16 @@ def prStatusResult(responseCode, name) {
     message = name + " is " + desc
     //System.out.println(responseCode)
     if (env.CHANGE_ID) {
-        pullRequest.createStatus(status: status,
-                context: 'continuous-integration/jenkins/pr-merge/' + name,
-                description: message)
+        if (url) {
+            pullRequest.createStatus(status: status,
+                    context: 'continuous-integration/jenkins/pr-merge/' + name,
+                    description: message,
+                    targetUrl: env.BUILD_URL + url)
+        } else {
+            pullRequest.createStatus(status: status,
+                    context: 'continuous-integration/jenkins/pr-merge/' + name,
+                    description: message)
+        }
     }
     if (responseCode != 0) {
         throw new RuntimeException(message)
