@@ -49,7 +49,7 @@
         <version>0.13</version>
         <configuration>
           <excludes>
-            <exclude>?</exclude>
+            <exclude>?**</exclude>
           </excludes>
         </configuration>
       </plugin>
