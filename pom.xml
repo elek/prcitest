@@ -46,16 +46,21 @@
       <plugin>
         <groupId>org.apache.rat</groupId>
         <artifactId>apache-rat-plugin</artifactId>
+        <version>0.13</version>
         <configuration>
           <excludes>
             <exclude>?</exclude>
           </excludes>
         </configuration>
       </plugin>
+      <plugin>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>
+          <failsOnError>true</failsOnError>
+        </configuration>
+      </plugin>
     </plugins>
-  </build>
 
-  <build>
     <pluginManagement>
       <plugins>
         <plugin>
@@ -88,18 +93,6 @@
         </plugin>
       </plugins>
     </pluginManagement>
-    <plugins>
-      <plugin>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-        <configuration>
-          <failsOnError>true</failsOnError>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.rat</groupId>
-        <artifactId>apache-rat-plugin</artifactId>
-        <version>0.13</version>
-      </plugin>
-    </plugins>
+
   </build>
 </project>
