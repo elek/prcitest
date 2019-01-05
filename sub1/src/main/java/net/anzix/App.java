@@ -2,13 +2,17 @@ package net.anzix;
 
 /**
  * Hello world!
+ *
+ * @author elek
  */
 public final class App {
 
+  public int ASD = 2;
   /**
    * Constructor.
    */
   private App() {
+    ASD = ASD;
   }
 
   /**

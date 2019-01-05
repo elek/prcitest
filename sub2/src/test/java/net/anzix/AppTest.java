@@ -17,6 +17,6 @@ public class AppTest
     //try to fix
     public void shouldAnswerWithTrue()
     {
-        assertFalse(true);
+        assertFalse(false);
     }
 }

@@ -14,8 +14,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-findbugs
-computeBugHistory
-convertXmlToText
-filterBugs
-setBugDatabaseInfo
+FINDBUGS_ALL_FILE=./target/findbugs-all.txt
+
+rm "$FINDBUGS_ALL_FILE" || true
+touch "$FINDBUGS_ALL_FILE"
+
+mvn -fn findbugs:check -Dfindbugs.failOnError=false
+
+find -name findbugsXml.xml | xargs -n1 convertXmlToText >> "${FINDBUGS_ALL_FILE}"
+
+bugs=$(cat "$FINDBUGS_ALL_FILE" | wc -l)
+
+if [[ ${bugs} -gt 0 ]]; then
+   exit -1
+else
+   exit 0
+fi

@@ -14,5 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 echo `pwd`
-mvn -fn test -am -pl :hadoop-ozone-dist -Phdds
-exit $?
+mvn -fn test
+module_failed_tests=$(find "." -name 'TEST*.xml'\
+    | xargs "grep" -l -E "<failure|<error"\
+    | awk -F/ '{sub("'"TEST-JUNIT_TEST_OUTPUT_DIR"'",""); sub(".xml",""); print $NF}')
+if [[ -n "${module_failed_tests}" ]] ; then
+    exit -1
+fi
+exit 0

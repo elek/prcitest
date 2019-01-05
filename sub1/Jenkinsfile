@@ -12,28 +12,34 @@ node {
 
         stage('Licence') {
             prStatusStart("licence")
-            output = sh returnStatus: true, script: './rat.sh'
+            output = sh returnStatus: true, script: 'sub1/dev-support/checks/rat.sh'
             prStatusResult(status, "licence")
         }
 
         stage('Author') {
             prStatusStart("author")
-            output = sh returnStatus: true, script: './author.sh'
+            output = sh returnStatus: true, script: 'sub1/dev-support/checks/author.sh'
             prStatusResult(status, "author")
         }
 
         stage('Unit test') {
             prStatusStart("test")
-            output = sh returnStatus: true, script: 'mvn test -fn'
+            output = sh returnStatus: true, script: 'sub1/dev-support/checks/unit.sh'
             junit '**/target/surefire-reports/*.xml'
             prStatusResult(status, "test")
         }
 
         stage('Checkstyle') {
             prStatusStart("checkstyle")
-            output = sh returnStatus: true, script: './checkstyle.sh'
+            output = sh returnStatus: true, script: 'sub1/dev-support/checks/checkstyle.sh'
             prStatusResult(status, "checkstyle")
         }
+
+          stage('Checkstyle') {
+                    prStatusStart("checkstyle")
+                    output = sh returnStatus: true, script: 'sub1/dev-support/checks/checkstyle.sh'
+                    prStatusResult(status, "checkstyle")
+                }
     }
 
 }
