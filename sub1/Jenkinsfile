@@ -2,12 +2,15 @@ node {
 
     docker.image('elek/ozone-build').inside {
 
+        stage('Checkout') {
+            scm checkout
+        }
 
         stage('Clean') {
             status = sh returnStatus: true, script: 'mvn clean'
         }
 
-        stageRunner('Author', "author")
+        stageRunner('Author', "author", {})
 
         stage('Build') {
             prStatusStart("build")
@@ -15,24 +18,27 @@ node {
             prStatusResult(status, "build")
         }
 
-        stageRunner('Licence', "rat")
+        stageRunner('Licence', "rat", {})
 
-        stageRunner('Unit test', "unit")
+        stageRunner('Unit test', "unit", {
+            junit '**/target/surefire-reports/*.xml'
+        })
 
-        stageRunner('Findbugs', "findbugs")
+        stageRunner('Findbugs', "findbugs", {})
 
-        stageRunner('Checkstyle', "checkstyle")
+        stageRunner('Checkstyle', "checkstyle", {})
 
     }
 
 }
 
-def stageRunner(name, type) {
+def stageRunner(name, type, processResult) {
     try {
         stage(name) {
 
             prStatusStart(type)
             status = sh returnStatus: true, script: 'sub1/dev-support/checks/' + type + '.sh'
+            processResult()
             prStatusResult(status, type)
         }
         return true
