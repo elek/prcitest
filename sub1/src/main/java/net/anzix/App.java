@@ -5,14 +5,6 @@ package net.anzix;
  */
 public final class App {
 
-  public int ASD = 3;
-  /**
-   * Constructor.
-   */
-  private App() {
-    ASD = ASD;
-  }
-
   /**
    * asd.
    *
