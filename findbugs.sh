@@ -13,10 +13,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-mkdir -p ./target
-grep -r --exclude="author.sh" --exclude="CHANGELOG.*" --exclude="target" "@author" .
-if [ $? -gt 0 ]; then
-  exit 0
-else
-  exit -1
-fi
+
+findbugs
+computeBugHistory
+convertXmlToText
+filterBugs
+setBugDatabaseInfo

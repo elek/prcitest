@@ -13,10 +13,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-mkdir -p ./target
-grep -r --exclude="author.sh" --exclude="CHANGELOG.*" --exclude="target" "@author" .
-if [ $? -gt 0 ]; then
-  exit 0
-else
-  exit -1
+
+mkdir -p target
+rm target/rat-aggregated.txt
+mvn -fn org.apache.rat:apache-rat-plugin:0.13:check
+grep -r --include=rat.txt "!????" | tee ./target/rat-aggregated.txt
+if [ "$(cat target/rat-aggregated.txt)" ]; then
+   exit -1
 fi
+
