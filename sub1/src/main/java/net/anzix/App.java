@@ -22,6 +22,9 @@ package net.anzix;
  */
 public final class App {
 
+  /**
+   * Java doc comment. Don't know why.
+   */
   private App() {
   }
 
