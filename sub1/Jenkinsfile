@@ -72,11 +72,11 @@ def stageRunner(name, type, processResult, url = '') {
 }
 
 def prStatusStart(name) {
-    if (env.CHANGE_ID) {
+//    if (env.CHANGE_ID) {
         pullRequest.createStatus(status: "pending",
                 context: 'continuous-integration/jenkins/pr-merge/' + name,
                 description: name + " is started")
-    }
+//    }
 }
 
 def prStatusResult(responseCode, name, url = '') {
@@ -88,7 +88,7 @@ def prStatusResult(responseCode, name, url = '') {
     }
     message = name + " is " + desc
     //System.out.println(responseCode)
-    if (env.CHANGE_ID) {
+//    if (env.CHANGE_ID) {
         if (url) {
             pullRequest.createStatus(status: status,
                     context: 'continuous-integration/jenkins/pr-merge/' + name,
@@ -99,7 +99,7 @@ def prStatusResult(responseCode, name, url = '') {
                     context: 'continuous-integration/jenkins/pr-merge/' + name,
                     description: message)
         }
-    }
+//    }
     if (responseCode != 0) {
         throw new RuntimeException(message)
     }
