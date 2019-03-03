@@ -1,0 +1,6 @@
+{
+  "state": "success",
+  "target_url": "https://builds.apache.org",
+  "description": "Ignore it, please.",
+  "context": "continuous-integration/jenkins/pr-head"
+}
